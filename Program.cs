@@ -13,16 +13,15 @@ var builder = WebApplication.CreateBuilder(args);
 var connectionString = builder.Configuration.GetConnectionString("Login_systemContext")
     ?? throw new InvalidOperationException("Connection string 'Login_systemContext' not found.");
 
-
 builder.Services.AddDbContext<Login_systemContext>(options =>
     options.UseSqlServer(connectionString));
 
 
 builder.Services.AddControllers();
-
-
 builder.Services.AddOpenApi();
 
+
+builder.Services.AddCors();
 
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
@@ -41,10 +40,8 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     };
 });
 
-// Authorization
+
 builder.Services.AddAuthorization();
-
-
 
 builder.Services.AddScoped<EmailsService>();
 builder.Services.AddScoped<IUserService, UserService>();
@@ -52,7 +49,11 @@ builder.Services.AddScoped<IAuthService, AuthService>();
 
 var app = builder.Build();
 
-app.UseCors(p => p.AllowAnyHeader().AllowAnyMethod().AllowAnyOrigin());
+
+app.UseCors(p => p
+    .AllowAnyHeader()
+    .AllowAnyMethod()
+    .AllowAnyOrigin());
 
 if (app.Environment.IsDevelopment())
 {
@@ -60,6 +61,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
 
 app.UseAuthentication();
 app.UseAuthorization();
